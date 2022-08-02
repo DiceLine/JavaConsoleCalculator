@@ -2,7 +2,7 @@
 
 public class Calculator {
 
-    public static String toStringInArabic(String number) throws ExpressionException {
+    static String toStringInArabic(String number) throws ExpressionException {
         if(number.length() > 4) {
             throw new ExpressionException("One of two Roman numbers is bigger than 10");
         }
@@ -34,29 +34,29 @@ public class Calculator {
     }
 
 
-    private static final int[] ARABIC_NUMBERS = {
+    static final int[] ARABIC_NUMBERS = {
             100,   90,  50,   40,   10,
             9,     5,   4,    1
     };
-    private static final String[] ROMAN_LETTERS = {
+    static final String[] ROMAN_LETTERS = {
             "C",  "XC", "L",  "XL",  "X",
             "IX", "V",  "IV", "I"
     };
-    public static String toStringInRoman(String number) throws ExpressionException {
+    static String toStringInRoman(String number) throws ExpressionException {
         int num = Integer.parseInt(number);
-        if(num < 1) throw new ExpressionException("Result must be greater than zero");
-        String result = "";
+        if(num < 1) throw new ExpressionException("The Roman number cannot be less than one");
+        String romanNumber = "";
         for (int i = 0; i < ARABIC_NUMBERS.length; ++i) {
             while (num >= ARABIC_NUMBERS[i]) {
-                result += ROMAN_LETTERS[i];
+                romanNumber += ROMAN_LETTERS[i];
                 num -= ARABIC_NUMBERS[i];
             }
         }
-        return result;
+        return romanNumber;
     }
 
 
-    private static class ExpressionException extends Exception {
+    static class ExpressionException extends Exception {
         ExpressionException(String message) {
             super(message);
         }
@@ -68,22 +68,22 @@ public class Calculator {
              throw new ExpressionException("Incomplete expression");
          }
 
-         String order = "";
-         final char ARABIC_NUM = 'a', ROMAN_NUM = 'r', OPERATION = 'o';
+         String orderOfTokens = "";
+         final char ARABIC_TOKEN = 'a', ROMAN_TOKEN = 'r', OPERATION_TOKEN = 'o';
 
          for(int i = 0; i < expression.length(); ++i) {
             if(expression.codePointAt(i) >= '0' && expression.codePointAt(i) <= '9') {
-                order += ARABIC_NUM;
+                orderOfTokens += ARABIC_TOKEN;
                 continue;
             }
 
             switch (expression.charAt(i))
             {
                 case 'I', 'V', 'X':
-                    order += ROMAN_NUM;
+                    orderOfTokens += ROMAN_TOKEN;
                     break;
                 case '+', '-', '*', '/':
-                    order += OPERATION;
+                    orderOfTokens += OPERATION_TOKEN;
                     break;
                 case ' ':
                     break;
@@ -93,8 +93,8 @@ public class Calculator {
         }
 
         int operationCounter = 0;
-        for(int i = 0; i < order.length(); ++i) {
-            if(order.charAt(i) == OPERATION) ++operationCounter;
+        for(int i = 0; i < orderOfTokens.length(); ++i) {
+            if(orderOfTokens.charAt(i) == OPERATION_TOKEN) ++operationCounter;
         }
 
         if(operationCounter == 0) {
@@ -105,14 +105,17 @@ public class Calculator {
             throw new ExpressionException("Have an extra operation symbol");
         }
 
-        final int INDEX_OF_OPERATION_IN_ORDER = order.indexOf(OPERATION);
-        if(order.charAt(0) == OPERATION || INDEX_OF_OPERATION_IN_ORDER == order.length() - 1) {
+        final int INDEX_OF_OPERATION_IN_ORDER = orderOfTokens.indexOf(OPERATION_TOKEN);
+        if(orderOfTokens.charAt(0) == OPERATION_TOKEN || 
+			INDEX_OF_OPERATION_IN_ORDER == orderOfTokens.length() - 1) {
             throw new ExpressionException("Have an invalid order of operation or\n" +
                     "One of the numbers is missing");
         }
 
-        for(int i = 0; i < order.length(); ++i) {
-            if(order.charAt(i) == order.charAt(0) || order.charAt(i) == OPERATION) {
+        for(int i = 0; i < orderOfTokens.length(); ++i) {
+            if(orderOfTokens.charAt(i) == orderOfTokens.charAt(0) || 
+				orderOfTokens.charAt(i) == OPERATION_TOKEN)
+			{
                 continue;
             }
             throw new ExpressionException("Mixing Arabic and Roman numerals");
@@ -126,13 +129,13 @@ public class Calculator {
             }
         }
 
-        // Length of String expression without spaces == length of String order
+        // Length of String expression without spaces == length of String orderOfTokens
         final char OPERATION_IN_EXPRESSION = cleanExpression.charAt(INDEX_OF_OPERATION_IN_ORDER);
         String a = cleanExpression.substring(0, INDEX_OF_OPERATION_IN_ORDER),
                 b = cleanExpression.substring(INDEX_OF_OPERATION_IN_ORDER + 1);
 
         // Translate Roman in Arabic
-        if(order.charAt(0) == ROMAN_NUM) {
+        if(orderOfTokens.charAt(0) == ROMAN_TOKEN) {
             a = toStringInArabic(a);
             b = toStringInArabic(b);
         }
@@ -160,7 +163,15 @@ public class Calculator {
                 result += Integer.parseInt(a) / Integer.parseInt(b);
                 break;
         }
-        return order.charAt(0) != ROMAN_NUM ? result : toStringInRoman(result);
+		if(orderOfTokens.charAt(0) == ARABIC_TOKEN) {
+			return result;
+		}
+		try {
+			return toStringInRoman(result);
+		} catch(ExpressionException ex) {
+			ex = new ExpressionException("Result of expression:  " + ex.getMessage());
+			throw ex;
+		}
     }
 
 
@@ -175,7 +186,7 @@ public class Calculator {
             System.out.println("\nThe program takes as input an expression, \n" +
                     "containing two numbers and the action between them, \n" +
                     "each number ranging from 1 to 10. \n" +
-                    "Examples of expressions are: \"7 + 9\", \"0 - 1\", \"5 * 5\", \"3 / 1\", \n" +
+                    "Examples of expressions are: \"7 + 9\", \"4 - 3\", \"5 * 5\", \"3 / 1\", \n" +
                     "\"III + IV\", \"IX - VIII\".\n" +
                     "The program returns the result of the action.\n" +
                     "The numbers in the expression can only be Arabic or only Roman, \n" +
