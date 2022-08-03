@@ -1,4 +1,4 @@
-
+import java.util.Scanner;
 
 public class Calculator {
 
@@ -176,23 +176,39 @@ public class Calculator {
 
 
     public static void main(String[] args) {
-        if(args == null || args.length != 1) {
-            System.out.println("Calculator \"EXPRESSION\" - to use\n" +
-                    "Calculator /? - to learn the command");
+        if(args == null || args.length > 1) {
+            System.out.println("java Calculator\n - to use" +
+                    "java Calculator \"EXPRESSION\" - to use\n" +
+                    "java Calculator /? - to learn the command\n" +
+                    "java Calculator /help - to learn the command");
             return;
         }
 
-        if(args[0].equals("/?")) {
-            System.out.println("\nThe program takes as input an expression, \n" +
-                    "containing two numbers and the action between them, \n" +
-                    "each number ranging from 1 to 10. \n" +
-                    "Examples of expressions are: \"7 + 9\", \"4 - 3\", \"5 * 5\", \"3 / 1\", \n" +
-                    "\"III + IV\", \"IX - VIII\".\n" +
-                    "The program returns the result of the action.\n" +
-                    "The numbers in the expression can only be Arabic or only Roman, \n" +
-                    "but not different as here: \"3 + V\", \"II - 1\".\n" +
-                    "The expression must have: '+', '-', '*', '/', 'I', 'V', 'X', space\n" +
-                    "The program ignores the space character\n");
+        if(args.length == 0) {
+            Scanner input;
+            try {
+                input = new Scanner(System.in);
+                System.out.println(calc(input.nextLine()));
+            } catch(Exception ex) {
+                System.out.println(ex.getMessage());
+            }
+            return;
+        }
+
+        if(args[0].equals("/?") || args[0].equals("/help")) {
+            System.out.println("\n java Calculator\n - to use" +
+                    " java Calculator \"EXPRESSION\" - to use\n" +
+                    " java Calculator /? - to learn the command");
+            System.out.println("\nDescription:\n The program takes as input an expression, \n" +
+                    " containing two numbers and the action between them, \n" +
+                    " each number ranging from 1 to 10. \n" +
+                    " Examples of expressions are: \"7 + 9\", \"4 - 3\", \"5 * 5\", \"3 / 1\", \n" +
+                    " \"III + IV\", \"IX - VIII\".\n" +
+                    " The program returns the result of the action.\n" +
+                    " The numbers in the expression can only be Arabic or only Roman, \n" +
+                    " but not different as here: \"3 + V\", \"II - 1\".\n" +
+                    " The expression must have: '+', '-', '*', '/', 'I', 'V', 'X', space\n" +
+                    " The program ignores the space character\n");
             return;
         }
 
